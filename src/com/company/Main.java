@@ -8,7 +8,7 @@ public class Main {
     	
     	final Client client = new Client();
     	
-    	client.connect();
+    	client.start();
 	
     	
     }
