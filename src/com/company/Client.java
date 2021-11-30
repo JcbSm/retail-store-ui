@@ -3,16 +3,36 @@ package com.company;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Client {
 	
 	private final String jdbc = "jdbc:postgresql://localhost:5432/retail_store";
 	private final String username = "postgres";
 	private final String password = "password";
-	
+		
 	private Connection connection;
+	private Scanner reader = new Scanner(System.in);
 	
 	public Client() {
+		
+		
+	}
+	
+	public void start() {
+		
+		System.out.println("Starting application...");
+		
+		connect();
+		
+		int branchID;
+		
+		do {
+			
+			System.out.print("Enter branch number: ");
+			
+		} while (!branchID)
+		
 		
 	}
 	
@@ -56,7 +76,6 @@ public class Client {
 			
 		} catch (SQLException e) {
 			
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 			
@@ -64,5 +83,6 @@ public class Client {
 		
 		
 	}
+	
 	
 }
