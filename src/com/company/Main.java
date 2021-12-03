@@ -1,15 +1,15 @@
 package com.company;
 
-public class Main {
-	
-	public Client client;
+import java.sql.SQLException;
 
-    public static void main(String[] args) {
+public class Main {
+
+	public static void main(String[] args) throws SQLException {
+
+		Client client = new Client();
     	
-    	final Client client = new Client();
-    	
-    	client.start();
-	
+    	client.init();
+		client.disconnect();
     	
     }
 }
