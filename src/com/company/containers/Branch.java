@@ -1,6 +1,7 @@
 package com.company.containers;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -35,6 +36,12 @@ public class Branch {
     public void changeStockCondition(int productId, int oldCondition, int newCondition) throws SQLException {
 
         connection.prepareStatement(String.format("UPDATE stock SET condition = %d WHERE id IN (SELECT id FROM stock WHERE condition = %d AND branch_id = %d AND product_id = %d LIMIT 1);", newCondition, oldCondition, this.id, productId)).executeUpdate();
+
+    }
+
+    public void addEmployee(String fName, String lName, Date dob, int departmentId) throws SQLException {
+
+        connection.prepareStatement(String.format("INSERT INTO employees (first_name, last_name, dob, department_id, branch_id) VALUES ('%s', '%s', '%s', %d, %d);", fName, lName, dob, departmentId, this.id)).executeUpdate();
 
     }
 

@@ -5,6 +5,8 @@ import com.company.containers.Product;
 import com.company.containers.Stock;
 
 import java.sql.*;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -169,7 +171,7 @@ public class Client {
 		switch (selected) {
 			case 1 -> menuSales();
 			case 2 -> menuStockManagement();
-			case 3 -> showMenuAdmin();
+			case 3 -> menuAdmin();
 			case 4 -> exit();
 		}
 
@@ -278,7 +280,7 @@ public class Client {
 				System.out.printf("%n%s %s%n%n", product.getManufacturer(), product.getModel());
 				displayStock(counts, false);
 
-				System.out.print("\nWould you like to query stock again?: (y) ");
+				System.out.print("\nWould you like to query stock again?: (y/n) ");
 				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
 
 			} catch (Exception ex) {
@@ -331,7 +333,7 @@ public class Client {
 				}
 				System.out.println("Success!");
 
-				System.out.print("\nWould you like to write-on stock again?: (y) ");
+				System.out.print("\nWould you like to write-on stock again?: (y/n) ");
 				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
 
 			} catch(Exception ex) {
@@ -389,7 +391,7 @@ public class Client {
 				}
 				System.out.println("Success!");
 
-				System.out.print("\nWould you like to write-on stock again?: (y) ");
+				System.out.print("\nWould you like to write-on stock again?: (y/n) ");
 				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
 
 			} catch(Exception ex) {
@@ -473,7 +475,7 @@ public class Client {
 				System.out.println("Success!\n");
 				System.out.println("------------------------------------------");
 
-				System.out.print("\nWould you like to change stock condition again?: (y) ");
+				System.out.print("\nWould you like to change stock condition again?: (y/n) ");
 				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
 
 
@@ -490,7 +492,231 @@ public class Client {
 
 	}
 
-	private void showMenuAdmin() {
+	private int showMenuAdmin() {
+
+		System.out.println("\n\n\n\n------------| ADMIN MENU |------------");
+		System.out.printf("Branch: %s%n", branch.getName());
+		System.out.println();
+		System.out.println("1. Manage existing employees");
+		System.out.println("2. Add new employee");
+		System.out.println("3. Home");
+		System.out.println();
+		System.out.println("--------------------------------------\n");
+		System.out.print("Select an option: ");
+
+		return selectMenuOption(3);
+
+	}
+
+	private void menuAdmin() {
+
+		int selected = 0;
+
+		while (selected == 0) {
+
+			selected = showMenuAdmin();
+
+		}
+
+		switch (selected) {
+			default -> {
+			}
+			case 1 -> manageEmployees();
+			case 2 -> addEmployee();
+			case 3 -> menuMain();
+		}
+
+	}
+
+	private void manageEmployees() {
+
+		boolean restart;
+
+		do {
+
+			restart = false;
+
+			System.out.println("\n\n----------| Manage Employees |------------");
+
+			int input;
+
+			try {
+
+				input = reader.nextInt();
+
+				Product product = new Product(input, connection);
+
+				ResultSet rs = connection.prepareStatement(String.format("SELECT id FROM stock WHERE product_id = %d AND branch_id = %d", product.getId(), branch.getId())).executeQuery();
+				int[] counts = countStockConditions(rs);
+
+				System.out.printf("%n%s %s%n%n", product.getManufacturer(), product.getModel());
+				displayStock(counts, false);
+
+				System.out.print("\nWould you like to query stock again?: (y/n) ");
+				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				restart = true;
+			}
+
+			reader.nextLine();
+
+		} while (restart);
+
+		menuAdmin();
+
+	}
+
+	private void addEmployee() {
+
+		boolean restart;
+
+		do {
+
+			restart = false;
+
+			System.out.println("\n\n----------| Add employee |------------");
+
+			try {
+
+				boolean valid = false;
+				int dobYear = 0; int dobMonth = 0; int dobDay = 0;
+
+				// Initiate today's date to check against
+				Calendar dobInput = Calendar.getInstance(); Calendar today = Calendar.getInstance();
+				dobInput.set(Calendar.HOUR_OF_DAY, 0);
+				dobInput.set(Calendar.MINUTE, 0);
+				dobInput.set(Calendar.SECOND, 0);
+
+				System.out.print("First name: ");
+				String fName = reader.nextLine();
+
+				System.out.print("Last name: ");
+				String lName = reader.nextLine();
+
+				// Get Valid year for dob
+				while (!valid) {
+
+					try {
+
+						System.out.print("Year of birth: ");
+						dobYear = reader.nextInt();
+
+
+						if (dobYear > today.get(Calendar.YEAR)) {
+							System.out.println("\nDoB can't be in the future.\n");
+							continue;
+						} else if (dobYear < today.get(Calendar.YEAR) - 150) {
+							System.out.println("\nDoB can't be more than 100 years in the past\n");
+							continue;
+						}
+
+						dobInput.set(Calendar.YEAR, dobYear);
+
+						if (dobInput.compareTo(today) > 0) {
+							System.out.println("\nInvalid Date\n");
+							continue;
+						};
+
+						valid = true;
+
+					} catch (Exception ignored) {}
+
+				}
+
+				valid = false;
+
+				// Get valid month for dob
+				while (!valid) {
+
+					try {
+
+						System.out.print("Month of birth: ");
+						dobMonth = reader.nextInt() - 1;
+
+						if (dobMonth < 0 || dobMonth > 11) {
+							System.out.println("\nInvalid month.\n");
+							continue;
+						}
+
+						dobInput.set(Calendar.MONTH, dobMonth);
+
+						if (dobInput.compareTo(today) > 0) {
+							System.out.println("\nInvalid Date\n");
+							continue;
+						};
+
+						valid = true;
+
+					} catch (Exception ignored) {}
+
+				}
+
+				valid = false;
+
+				// Get valid month for dob
+				while (!valid) {
+
+					try {
+
+						System.out.print("Day of birth: ");
+						dobDay = reader.nextInt();
+
+						if (dobDay < 1 || dobDay > dobInput.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+							System.out.println("\nDays out of range for " + dobInput.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + "\n");
+							continue;
+						}
+
+						dobInput.set(Calendar.DAY_OF_MONTH, dobDay);
+
+						if (dobInput.compareTo(today) > 0) {
+							System.out.println("\nInvalid Date\n");
+							continue;
+						};
+
+						valid = true;
+
+					} catch (Exception ignored) {}
+
+				}
+
+				Date dob = new Date(dobInput.getTimeInMillis());
+
+				System.out.println("\n---------------------------\n");
+
+				System.out.printf("Name:	%s %s%n", fName, lName);
+				System.out.println("DoB:	" + dob);
+
+				System.out.print("\nCheck the above information is correct. Proceed?: (y/n) ");
+				if (!Objects.equals(reader.next().toLowerCase(), "y")) {
+					throw new Exception("Incorrect information.");
+				}
+
+				int department = 0;
+
+				while (department == 0) {
+					System.out.printf("%n-----| Select department for %s %s |-----%n", fName, lName);
+					department = menuDepartments();
+				}
+
+				branch.addEmployee(fName, lName, dob,department);
+
+				System.out.println("Success!\n");
+
+				System.out.print("\nWould you like to add another employee?: (y/n) ");
+				if (Objects.equals(reader.next().toLowerCase(), "y")) restart = true;
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				restart = true;
+			}
+
+			reader.nextLine();
+
+		} while (restart);
+
+		menuAdmin();
 
 	}
 
@@ -548,6 +774,27 @@ public class Client {
 			System.out.printf("Held-for: 		%d%n", counts[3]);
 
 		}
+	}
+
+	private int menuDepartments() throws Exception {
+
+		System.out.println();
+
+		ResultSet rs = connection.prepareStatement(String.format("SELECT id, name FROM departments")).executeQuery();
+		int count = 0;
+
+		while (rs.next()) {
+
+			count = count + 1;
+
+			System.out.printf("%d. %s%n", rs.getInt(1), rs.getString(2).toUpperCase());
+
+		}
+
+		System.out.println();
+
+		return selectMenuOption(count);
+
 	}
 
 }
