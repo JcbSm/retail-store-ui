@@ -20,6 +20,24 @@ public class Branch {
 
     }
 
+    public void addStock(int productId, int condition) throws SQLException {
+
+        connection.prepareStatement(String.format("INSERT INTO stock (branch_id, product_id, condition) VALUES (%d, %d, %d);", this.id, productId, condition)).executeUpdate();
+
+    }
+
+    public void removeStock(int productId, int condition) throws SQLException {
+
+        connection.prepareStatement(String.format("DELETE FROM stock WHERE id in (SELECT id from stock WHERE branch_id = %d AND product_id = %d AND condition = %d LIMIT 1)", this.id, productId, condition)).executeUpdate();
+
+    }
+
+    public void changeStockCondition(int productId, int oldCondition, int newCondition) throws SQLException {
+
+        connection.prepareStatement(String.format("UPDATE stock SET condition = %d WHERE id IN (SELECT id FROM stock WHERE condition = %d AND branch_id = %d AND product_id = %d LIMIT 1);", newCondition, oldCondition, this.id, productId)).executeUpdate();
+
+    }
+
     /**
      * @return Postcode for the branch
      * @throws SQLException SQL

@@ -20,6 +20,10 @@ public class Product {
 
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     public String getManufacturer() {
 
         String name = "none";
